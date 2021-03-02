@@ -126,6 +126,7 @@ private final KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_K
  // TODO: Execute the query
  // The datastore.run(query) method returns an iterator
  // for entities
+    Iterator<Entity> entities = datastore.run(query);
 
 
  // END TODO
@@ -133,7 +134,7 @@ private final KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_K
  // TODO: Return the transformed results
  // Use the buildQuestions(entities) method to convert
  // from Datastore entities to domain objects
-
+    return buildQuestions(entities);
 
 
  // END TODO
@@ -141,7 +142,7 @@ private final KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_K
     }
 
 
-/* TODO: Uncomment this block
+//  TODO: Uncomment this block
 
     private List<Question> buildQuestions(Iterator<Entity> entities){
         List<Question> questions = new ArrayList<>();
@@ -163,5 +164,5 @@ private final KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_K
                 .build();
     }
 
-*/
+
 }
