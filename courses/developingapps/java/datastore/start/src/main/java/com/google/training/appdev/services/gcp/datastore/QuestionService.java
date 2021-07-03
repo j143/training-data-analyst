@@ -17,7 +17,7 @@ package com.google.training.appdev.services.gcp.datastore;
 
 // TODO: Import the com.google.cloud.datastore.* package
 
-
+import com.google.cloud.datastore.*;
 
 // END TODO
 
@@ -38,7 +38,7 @@ public class QuestionService {
 // Use the getService() method of the DatastoreOptions
 // object to get the Datastore client
 
-
+private Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 // END TODO
 
 // TODO: Declare a static final String named kind
@@ -47,12 +47,12 @@ public class QuestionService {
 // 1. Specify the kind, and let Datastore generate a unique //    numeric id
 // 2. Specify the kind and a unique string id
 
-
+private static final String ENTITY_KIND = "Question";
 
 // END TODO
 
 // TODO: Create a KeyFactory for Question entities
-
+private final KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_KIND);
 
 // END TODO
 
@@ -62,13 +62,13 @@ public class QuestionService {
 
 // TODO: Modify return type to Key
 
-    public String createQuestion(Question question) {
+    public Key createQuestion(Question question) {
 
 // END TODO
 
 // TODO: Declare the entity key, 
 // with a Datastore allocated id
-
+      Key key = datastore.allocateId(keyFactory.newKey());
 
 // END TODO
  
@@ -76,7 +76,18 @@ public class QuestionService {
 // The entity's members are set using the Entity.Builder. 
 // This has a set method for property names and values
 // Values are retrieved from the Domain object
-
+//     Entity entity<key, data>  = Entity.Builder.Domain()
+   Entity questionEntity = Entity.newBuilder(key)
+      .set(Question.QUIZ, question.getQuiz())
+      .set(Question.AUTHOR, question.getAuthor())
+      .set(Question.TITLE, question.getTitle())
+      .set(Question.ANSWER_ONE,question.getAnswerOne())
+      .set(Question.ANSWER_TWO, question.getAnswerTwo())
+      .set(Question.ANSWER_THREE,question.getAnswerThree())
+      .set(Question.ANSWER_FOUR, question.getAnswerFour())
+      .set(Question.CORRECT_ANSWER,
+                              question.getCorrectAnswer())
+      .build();
 
 
 
@@ -85,37 +96,18 @@ public class QuestionService {
 // END TODO
 
 // TODO: Save the entity
-
+    datastore.put(questionEntity);
 // END TODO
 
 // TODO: Return the key
 
-        return "Replace this string with the key";
+        return key;
 
 // END TODO
     }
 
     public List<Question> getAllQuestions(String quiz){
 
-// TODO: Remove this code
-
-        List<Question> questions = new ArrayList<>();
-        Question dummy = new Question.Builder()
-                .withQuiz("gcp")
-                .withAuthor("Dummy Author")
-                .withTitle("Dummy Title")
-                .withAnswerOne("Dummy Answer One")
-                .withAnswerTwo("Dummy Answer Two")
-                .withAnswerThree("Dummy Answer Three")
-                .withAnswerFour("Dummy Answer Four")
-                .withCorrectAnswer(1)
-                .withId(-1)
-                .build();
-        questions.add(dummy);
-
-        return questions;
-
-// END TODO
 
  // TODO: Create the query
  // The Query class has a static newEntityQueryBuilder() 
@@ -123,13 +115,18 @@ public class QuestionService {
  // entities to be retrieved.
  // The query can be customized to filter the Question 
  // entities for one quiz.
-
+      Query<Entity> query = Query.newEntityQueryBuilder()
+        .setKind("Question")
+        .setFilter(StructuredQuery.PropertyFilter.eq(Question.QUIZ, quiz)
+            )
+        .build();
 
  // END TODO
 
  // TODO: Execute the query
  // The datastore.run(query) method returns an iterator
  // for entities
+    Iterator<Entity> entities = datastore.run(query);
 
 
  // END TODO
@@ -137,7 +134,7 @@ public class QuestionService {
  // TODO: Return the transformed results
  // Use the buildQuestions(entities) method to convert
  // from Datastore entities to domain objects
-
+    return buildQuestions(entities);
 
 
  // END TODO
@@ -145,7 +142,7 @@ public class QuestionService {
     }
 
 
-/* TODO: Uncomment this block
+//  TODO: Uncomment this block
 
     private List<Question> buildQuestions(Iterator<Entity> entities){
         List<Question> questions = new ArrayList<>();
@@ -167,5 +164,5 @@ public class QuestionService {
                 .build();
     }
 
-*/
+
 }
